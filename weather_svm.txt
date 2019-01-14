@@ -1,0 +1,35 @@
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+from sklearn import svm
+from sklearn import decomposition
+
+df = pd.read_csv("complete_lower_HTD.csv")
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+x = df.iloc[:,0:62].values
+# Separating out the target
+y = df.iloc[:,62:63].values
+scaler=StandardScaler()
+scaled_data=scaler.fit_transform(x)
+sklearn_pca=PCA(n_components='mle',svd_solver='full')
+reduced_data=sklearn_pca.fit_transform(x)
+from sklearn.model_selection import train_test_split
+
+X_train,X_test,y_train,y_test=train_test_split(reduced_data,y,test_size = 0.2)
+y_train=y_train.ravel()
+y_test=y_test.ravel()
+
+lr=svm.SVC(kernel='linear')
+lr.fit(X_train,y_train)
+pred=lr.predict(X_test)
+from sklearn import metrics
+print("Accuracy:",metrics.accuracy_score(y_test,pred))
+
+from sklearn.metrics import classification_report,confusion_matrix
+print(classification_report(y_test,pred))
+print(confusion_matrix(y_test,pred))
+
